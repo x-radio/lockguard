@@ -7,7 +7,14 @@
 #include "freertos/task.h"
 #include <atomic>
 //=============================================================================
-typedef std::atomic<bool> LockGuardMtx;
+#define if_lockguard_return(mtx, task, timeout) LockGuard grd(task, timeout); if(!grd.take(mtx)) return;
+//=============================================================================
+struct LockGuardMtx
+{
+    std::atomic<bool> locked{false};
+    TaskHandle_t owner{nullptr};
+    uint32_t recursionCount{0};
+};
 //=============================================================================
 class LockGuard
 {
@@ -20,10 +27,10 @@ class LockGuard
     LockGuard(TaskHandle_t task = NULL, TickType_t timeout = portMAX_DELAY);
     ~LockGuard();
 
-    bool ok(TaskHandle_t task, SemaphoreHandle_t &mtx);
     bool take(SemaphoreHandle_t &mtx, TickType_t timeout);
-    bool ok(TaskHandle_t task, LockGuardMtx &mtx);
+    bool take(SemaphoreHandle_t &mtx);
     bool take(LockGuardMtx &mtx, TickType_t timeout);
+    bool take(LockGuardMtx &mtx);
 };
 //=============================================================================
 #endif
