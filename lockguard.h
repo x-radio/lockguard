@@ -7,7 +7,7 @@
 #include "freertos/task.h"
 #include <atomic>
 //=============================================================================
-#define if_lockguard_return(mtx, task, timeout) LockGuard grd(task, timeout); if(!grd.take(mtx)) return;
+#define if_lockguard_return(mtx, task, timeout) LockGuard grd(task, timeout); if(!grd.take(mtx)) {timer = gt; return;}
 //=============================================================================
 struct LockGuardMtx
 {
